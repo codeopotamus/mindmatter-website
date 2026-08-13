@@ -92,7 +92,7 @@
       </div>
 
       <div class="phone-wrap">
-        <img class="phone" src="shots/Everything.jpg" width="620" height="1307"
+        <img class="phone par" data-depth="0.05" src="shots/Everything.jpg" width="620" height="1307"
              alt="The Mind Matter home screen showing quick tools, a treatment plan, assessments, streaks and therapy programs." />
       </div>
     </div>
@@ -123,6 +123,35 @@
           There is no clinician on the other end. It is a tool for self-awareness and healthy
           habits, designed to sit alongside professional care — never to replace it.
         </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ INTERACTIVE DEMO ══ -->
+  <section class="band" id="demo">
+    <div class="shell">
+      <div class="head rv">
+        <p class="eyebrow">Try it right here</p>
+        <h2>Have a look around before you download anything.</h2>
+        <p class="lede" style="margin-top:14px">
+          This is a working miniature of the app. Tap through it &mdash; the same four screens
+          you would live in day to day.
+        </p>
+      </div>
+
+      <div class="demo-wrap">
+        <div class="demo-copy rv-l">
+          <div class="seg" id="demoSeg" aria-label="Choose a screen"></div>
+          <h3 id="demoTitle">It starts with one tap.</h3>
+          <p id="demoText"></p>
+          <p class="demo-hint" id="demoHint">Tap a tab to take control.</p>
+        </div>
+
+        <div class="demo-stage rv-s">
+          <div class="device">
+            <div class="screen" id="demoScreen"></div>
+          </div>
+        </div>
       </div>
     </div>
   </section>
@@ -387,5 +416,6 @@
 </footer>
 
 <script src="site.js"></script>
+<script src="demo.js"></script>
 </body>
 </html>

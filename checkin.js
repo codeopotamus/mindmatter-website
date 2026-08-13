@@ -1,21 +1,36 @@
-/* Free self-screeners — PHQ-9 and GAD-7.
-   Everything runs in the browser. Answers are held in a local variable, never
-   persisted and never transmitted; reloading the page discards them.
-
-   Safety rule that matters most here: PHQ-9 item 9 asks about thoughts of being
-   better off dead or of self-harm. ANY non-zero answer there surfaces crisis
-   resources above the score, regardless of the total — a low total with a
-   positive item 9 is exactly the case a naive sum would bury. */
-
+/* Free self-screeners — PHQ-9, GAD-7, ASRS-v1.1 Part A, AUDIT, and a combined
+ * "full check-in" that runs all four.
+ *
+ * ── Licensing ───────────────────────────────────────────────────────────────
+ * Only instruments that are unambiguously free for commercial use appear here:
+ *   PHQ-9   public domain            GAD-7   public domain
+ *   ASRS    WHO, no permission req.  AUDIT   WHO, no permission req.
+ * The app ships others (MDQ, PCL-5, OCI-R, ULS-8 …) whose licences are flagged
+ * "commercial use not yet verified" — those deliberately stay out of a public
+ * marketing site.
+ *
+ * ── Safety ──────────────────────────────────────────────────────────────────
+ * PHQ-9 item 9 asks about thoughts of being better off dead or of self-harm.
+ * ANY non-zero answer surfaces crisis resources above the score, in every mode,
+ * regardless of the total. A low total with a positive item 9 is precisely the
+ * person a score-threshold trigger would miss. Do not make this conditional.
+ *
+ * ── Privacy ─────────────────────────────────────────────────────────────────
+ * No storage, no network, no analytics. Answers live in a local variable and
+ * die with the tab. The page promises this to the reader; keep it true.
+ */
 (function () {
-  var SCALE = ['Not at all', 'Several days', 'More than half the days', 'Nearly every day'];
+  'use strict';
 
-  var TESTS = {
+  var FREQ4 = ['Not at all', 'Several days', 'More than half the days', 'Nearly every day'];
+  var FREQ5 = ['Never', 'Rarely', 'Sometimes', 'Often', 'Very often'];
+
+  var INSTRUMENTS = {
     phq9: {
-      name: 'PHQ-9',
-      full: 'Patient Health Questionnaire',
-      max: 27,
-      riskItem: 8, // 0-indexed: "thoughts that you would be better off dead…"
+      name: 'PHQ-9', domain: 'Mood', icon: '🧠', max: 27, riskItem: 8,
+      cite: 'Kroenke, Spitzer &amp; Williams, 2001',
+      lead: 'Over the last two weeks, how often have you been bothered by…',
+      scale: FREQ4, vals: [0, 1, 2, 3], mode: 'sum',
       questions: [
         'Little interest or pleasure in doing things you normally enjoy',
         'Feeling down, depressed, hopeless, or empty inside',
@@ -28,18 +43,19 @@
         'Thoughts that you would be better off dead, or thoughts of hurting yourself in any way'
       ],
       severity: [
-        [0, 4, 'Minimal', '#2a9e6a', 'Your answers suggest minimal or no depressive symptoms. That is worth noting rather than dismissing — whatever you are doing for your sleep, movement and connection appears to be holding.'],
-        [5, 9, 'Mild', '#EF9F27', 'Your answers suggest mild depressive symptoms. This is the range where small, boring, consistent things genuinely move the needle: sleep, daylight, movement, and talking to someone. Speaking with a therapist is a worthwhile step, not an overreaction.'],
-        [10, 14, 'Moderate', '#EF9F27', 'Your answers suggest moderate depression. This is the point where most guidance recommends speaking with a mental health professional rather than trying to manage it alone. Cognitive behavioural therapy has strong evidence at this level.'],
-        [15, 19, 'Moderately Severe', '#E24B4A', 'Your answers suggest moderately severe depression. Please reach out to a mental health professional soon. This is treatable, effective options exist including therapy and medication, and waiting rarely makes it easier.'],
-        [20, 27, 'Severe', '#E24B4A', 'Your answers suggest severe depression. Please seek professional help — this week, not eventually. If you are in crisis or having thoughts of harming yourself, use the crisis numbers on this page right now.']
+        [0, 4, 'Minimal', '#2a9e6a', 'Your answers suggest minimal or no depressive symptoms. Worth noting rather than dismissing — whatever you are doing for sleep, movement and connection appears to be holding.'],
+        [5, 9, 'Mild', '#EF9F27', 'Your answers suggest mild depressive symptoms. This is the range where boring, consistent things genuinely move the needle: sleep, daylight, movement, and talking to someone. Seeing a therapist here is a reasonable step, not an overreaction.'],
+        [10, 14, 'Moderate', '#EF9F27', 'Your answers suggest moderate depression. This is the point where most guidance recommends speaking with a mental health professional rather than managing it alone. CBT has strong evidence at this level.'],
+        [15, 19, 'Moderately severe', '#E24B4A', 'Your answers suggest moderately severe depression. Please reach out to a professional soon. This is treatable — therapy and medication both have good evidence — and waiting rarely makes it easier.'],
+        [20, 27, 'Severe', '#E24B4A', 'Your answers suggest severe depression. Please seek professional help this week, not eventually. If you are in crisis, use the numbers on this page now.']
       ]
     },
+
     gad7: {
-      name: 'GAD-7',
-      full: 'Generalized Anxiety Disorder Scale',
-      max: 21,
-      riskItem: -1,
+      name: 'GAD-7', domain: 'Anxiety', icon: '💭', max: 21, riskItem: -1,
+      cite: 'Spitzer, Kroenke, Williams &amp; Löwe, 2006',
+      lead: 'Over the last two weeks, how often have you been bothered by…',
+      scale: FREQ4, vals: [0, 1, 2, 3], mode: 'sum',
       questions: [
         'Feeling nervous, anxious, on edge, or keyed up',
         'Not being able to stop or control worrying even when you want to',
@@ -50,17 +66,85 @@
         'Feeling afraid, as if something awful is about to happen'
       ],
       severity: [
-        [0, 4, 'Minimal', '#2a9e6a', 'Your answers suggest minimal anxiety. Worth keeping an eye on if your circumstances change, but nothing here points to a problem right now.'],
-        [5, 9, 'Mild', '#EF9F27', 'Your answers suggest mild anxiety. Breathing work, regular movement, protecting your sleep and watching caffeine all have real evidence behind them at this level.'],
-        [10, 14, 'Moderate', '#EF9F27', 'Your answers suggest moderate anxiety. This is the range where talking to a professional is genuinely worth doing — CBT and exposure-based approaches have strong evidence and often work faster than people expect.'],
-        [15, 21, 'Severe', '#E24B4A', 'Your answers suggest severe anxiety. Please consult a mental health professional soon. Anxiety at this level is exhausting and highly treatable — do not wait it out alone.']
+        [0, 4, 'Minimal', '#2a9e6a', 'Your answers suggest minimal anxiety. Worth watching if circumstances change, but nothing here points to a problem right now.'],
+        [5, 9, 'Mild', '#EF9F27', 'Your answers suggest mild anxiety. Breathing work, regular movement, protecting sleep and watching caffeine all have real evidence at this level.'],
+        [10, 14, 'Moderate', '#EF9F27', 'Your answers suggest moderate anxiety. Worth talking to a professional — CBT and exposure-based approaches have strong evidence and often work faster than people expect.'],
+        [15, 21, 'Severe', '#E24B4A', 'Your answers suggest severe anxiety. Please consult a professional soon. Anxiety at this level is exhausting and highly treatable — do not wait it out alone.']
+      ]
+    },
+
+    asrs: {
+      name: 'ASRS-v1.1', domain: 'Focus & attention', icon: '⚡', max: 6, riskItem: -1,
+      cite: 'Kessler et al., 2005 (WHO)',
+      lead: 'Over the past 6 months, how often have you experienced…',
+      scale: FREQ5, vals: [0, 1, 2, 3, 4], mode: 'thresholdCount',
+      // Official Part A scoring: items 1–3 screen positive at "Sometimes",
+      // items 4–6 only at "Often". Summing raw frequencies over-weights
+      // hyperactivity and misses quieter inattentive presentations.
+      thresholds: [2, 2, 2, 3, 3, 3],
+      questions: [
+        'Trouble wrapping up the final details of a project, once the challenging parts are done',
+        'Difficulty getting things in order when you have to do a task requiring organisation',
+        'Problems remembering appointments or obligations you have made',
+        'Avoiding or delaying getting started on a task that requires a lot of thought',
+        'Fidgeting or squirming when you have to sit down for a long time',
+        'Feeling overly active and compelled to do things, like you were driven by a motor'
+      ],
+      severity: [
+        [0, 3, 'Below screening threshold', '#2a9e6a', 'Fewer than four answers reached that question\'s threshold, so this screen is negative. A negative screen is not proof of absence — the ASRS is known to miss quieter, inattentive presentations. If focus problems are genuinely costing you, that is worth a conversation regardless of this result.'],
+        [4, 6, 'Positive screen', '#E24B4A', 'Four or more answers reached their threshold — a positive ASRS screen, the level at which the WHO recommends a full evaluation. This is not a diagnosis: a real ADHD assessment examines your history, functioning, and other explanations. A psychiatrist or psychologist can do that properly.']
+      ]
+    },
+
+    audit: {
+      name: 'AUDIT', domain: 'Alcohol', icon: '🍷', max: 40, riskItem: -1,
+      cite: 'Saunders et al., 1993 (WHO)',
+      lead: 'About your drinking over the past year…',
+      scale: ['Never', 'Monthly or less', 'Two to four times a month', 'Two to three times a week', 'Four or more times a week'],
+      vals: [0, 1, 2, 3, 4], mode: 'sum',
+      // The last two items are lifetime/past-year questions with three options
+      // scored 0/2/4 — not the five-point frequency scale the first eight use.
+      itemScales: {
+        1: { scale: ['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more'], vals: [0, 1, 2, 3, 4] },
+        2: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        3: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        4: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        5: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        6: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        7: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
+        8: { scale: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], vals: [0, 2, 4] },
+        9: { scale: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], vals: [0, 2, 4] }
+      },
+      questions: [
+        'How often do you have a drink containing alcohol?',
+        'How many standard drinks do you have on a typical day when you are drinking?',
+        'How often do you have six or more drinks on one occasion?',
+        'How often have you found that you were not able to stop drinking once you had started?',
+        'How often have you failed to do what was normally expected of you because of drinking?',
+        'How often have you needed a drink in the morning to get yourself going after a heavy session?',
+        'How often have you had a feeling of guilt or remorse after drinking?',
+        'How often have you been unable to remember what happened the night before because of drinking?',
+        'Have you or someone else been injured as a result of your drinking?',
+        'Has a relative, friend, doctor or health worker been concerned about your drinking, or suggested you cut down?'
+      ],
+      severity: [
+        [0, 7, 'Low risk', '#2a9e6a', 'Your answers suggest low-risk drinking. Worth staying mindful of how alcohol interacts with sleep and mood, but nothing here flags a problem.'],
+        [8, 15, 'Hazardous', '#EF9F27', 'Your answers suggest hazardous drinking that raises your risk of health problems. Worth raising with a GP or healthcare provider — this is a very common conversation and not a judgemental one.'],
+        [16, 19, 'Harmful', '#E24B4A', 'Your answers suggest harmful drinking. Please speak with a healthcare provider. Counselling and support are available and genuinely effective.'],
+        [20, 40, 'Possible dependence', '#E24B4A', 'Your answers suggest possible alcohol dependence. Please speak with a healthcare provider as soon as you can. Effective treatment and support exist, and stopping abruptly without advice can be unsafe.']
       ]
     }
   };
 
+  var MODES = {
+    phq9: { title: 'PHQ-9 · Depression', parts: ['phq9'] },
+    gad7: { title: 'GAD-7 · Anxiety', parts: ['gad7'] },
+    full: { title: 'Full check-in', parts: ['phq9', 'gad7', 'asrs', 'audit'] }
+  };
+
   var CRISIS_HTML =
     '<div class="crisis">' +
-      '<h3>Before your score — please read this</h3>' +
+      '<h3>Before your results — please read this</h3>' +
       '<p>You indicated some thoughts of being better off dead or of hurting yourself. ' +
       'That matters more than any number on this page, and it deserves a person rather ' +
       'than an app. You are not overreacting by reaching out, and you do not have to be ' +
@@ -76,80 +160,169 @@
       'hardest and most useful step.</p>' +
     '</div>';
 
-  var el = function (id) { return document.getElementById(id); };
-  var intro = el('intro'), pick = el('pick'), quiz = el('quiz'), result = el('result');
+  var $ = function (id) { return document.getElementById(id); };
+  var intro = $('intro'), pick = $('pick'), quiz = $('quiz'), result = $('result');
   if (!quiz) return;
 
-  var current = null, answers = [], idx = 0;
+  var mode = null, queue = [], answers = {}, flat = [], pos = 0;
 
-  function show(section) {
-    intro.style.display = section === 'pick' ? '' : 'none';
-    pick.style.display = section === 'pick' ? '' : 'none';
-    quiz.classList.toggle('live', section === 'quiz');
-    result.classList.toggle('live', section === 'result');
+  function show(which) {
+    if (intro) intro.style.display = which === 'pick' ? '' : 'none';
+    if (pick) pick.style.display = which === 'pick' ? '' : 'none';
+    quiz.classList.toggle('live', which === 'quiz');
+    result.classList.toggle('live', which === 'result');
     window.scrollTo({ top: 0, behavior: 'instant' });
   }
 
   function start(key) {
-    current = TESTS[key];
-    answers = [];
-    idx = 0;
+    mode = MODES[key];
+    if (!mode) return;
+    queue = mode.parts.slice();
+    answers = {};
+    flat = [];
+    queue.forEach(function (k) {
+      answers[k] = [];
+      INSTRUMENTS[k].questions.forEach(function (_, qi) { flat.push({ inst: k, q: qi }); });
+    });
+    pos = 0;
     show('quiz');
     render();
   }
 
-  function render() {
-    var total = current.questions.length;
-    el('qprog').style.width = (idx / total * 100) + '%';
-    el('qcount').textContent = current.name + ' · Question ' + (idx + 1) + ' of ' + total;
-    el('qtext').textContent = current.questions[idx];
-    el('qback').style.visibility = idx === 0 ? 'hidden' : 'visible';
+  function scaleFor(inst, qi) {
+    var I = INSTRUMENTS[inst];
+    if (I.itemScales && I.itemScales[qi]) return I.itemScales[qi];
+    return { scale: I.scale, vals: I.vals };
+  }
 
-    var opts = el('qopts');
+  function render() {
+    var step = flat[pos];
+    var I = INSTRUMENTS[step.inst];
+    var sc = scaleFor(step.inst, step.q);
+
+    $('qprog').style.width = (pos / flat.length * 100) + '%';
+
+    var flag = $('qflag');
+    if (flag) {
+      if (mode.parts.length > 1) {
+        var si = mode.parts.indexOf(step.inst) + 1;
+        flag.innerHTML = '<span>' + I.icon + '</span> Section ' + si + ' of ' + mode.parts.length + ' · ' + I.domain;
+        flag.style.display = '';
+      } else {
+        flag.style.display = 'none';
+      }
+    }
+
+    $('qcount').textContent = I.name + ' · Question ' + (step.q + 1) + ' of ' + I.questions.length +
+      (mode.parts.length > 1 ? '  ·  ' + (pos + 1) + '/' + flat.length + ' overall' : '');
+    $('qlead').textContent = I.lead;
+    $('qtext').textContent = I.questions[step.q];
+    $('qback').style.visibility = pos === 0 ? 'hidden' : 'visible';
+
+    var opts = $('qopts');
     opts.innerHTML = '';
-    SCALE.forEach(function (label, value) {
+    sc.scale.forEach(function (label, i) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'opt';
-      b.innerHTML = '<span class="mark"></span><span>' + label + '</span>';
-      b.addEventListener('click', function () { answer(value); });
+      var chosen = answers[step.inst][step.q];
+      var isSel = chosen === sc.vals[i];
+      b.innerHTML = '<span class="mark"' + (isSel ? ' style="border-color:#5b9dff;background:#5b9dff"' : '') +
+        '></span><span>' + label + '</span>';
+      b.addEventListener('click', function () { answer(sc.vals[i]); });
       opts.appendChild(b);
     });
   }
 
   function answer(value) {
-    answers[idx] = value;
-    if (idx < current.questions.length - 1) {
-      idx++;
-      render();
+    var step = flat[pos];
+    answers[step.inst][step.q] = value;
+    if (pos < flat.length - 1) { pos++; render(); }
+    else { finish(); }
+  }
+
+  function scoreOne(key) {
+    var I = INSTRUMENTS[key];
+    var a = answers[key];
+    var total;
+
+    if (I.mode === 'thresholdCount') {
+      total = 0;
+      for (var i = 0; i < a.length; i++) if (a[i] >= I.thresholds[i]) total++;
     } else {
-      finish();
+      total = a.reduce(function (x, y) { return x + (y || 0); }, 0);
     }
+
+    var band = I.severity[I.severity.length - 1];
+    for (var j = 0; j < I.severity.length; j++) {
+      if (total >= I.severity[j][0] && total <= I.severity[j][1]) { band = I.severity[j]; break; }
+    }
+    return { total: total, band: band, inst: I };
   }
 
   function finish() {
-    var total = answers.reduce(function (a, b) { return a + b; }, 0);
-
-    var band = current.severity[current.severity.length - 1];
-    for (var i = 0; i < current.severity.length; i++) {
-      if (total >= current.severity[i][0] && total <= current.severity[i][1]) {
-        band = current.severity[i];
-        break;
-      }
+    // Item-9 check runs independently of every total score, in every mode.
+    var flagged = false;
+    if (answers.phq9 && answers.phq9.length) {
+      var ri = INSTRUMENTS.phq9.riskItem;
+      flagged = answers.phq9[ri] > 0;
     }
+    $('crisisSlot').innerHTML = flagged ? CRISIS_HTML : '';
 
-    // Item-9 safety check runs independently of the total score.
-    var flagged = current.riskItem >= 0 && answers[current.riskItem] > 0;
-    el('crisisSlot').innerHTML = flagged ? CRISIS_HTML : '';
+    var single = mode.parts.length === 1;
+    var scores = mode.parts.map(scoreOne);
 
-    el('scoreN').textContent = total;
-    el('scoreN').style.color = band[3];
-    el('scoreOf').textContent = 'out of ' + current.max + ' · ' + current.name;
-    el('scoreBand').textContent = band[2];
-    el('scoreBand').style.color = band[3];
-    el('scoreBand').style.background = band[3] + '22';
-    el('scoreBand').style.border = '1px solid ' + band[3] + '55';
-    el('scoreSay').textContent = band[4];
+    $('scoreCard').style.display = single ? '' : 'none';
+    $('profile').style.display = single ? 'none' : '';
+
+    if (single) {
+      var s = scores[0];
+      $('scoreN').textContent = s.total;
+      $('scoreN').style.color = s.band[3];
+      $('scoreOf').textContent = 'out of ' + s.inst.max + ' · ' + s.inst.name;
+      $('scoreBand').textContent = s.band[2];
+      $('scoreBand').style.color = s.band[3];
+      $('scoreBand').style.background = s.band[3] + '22';
+      $('scoreBand').style.border = '1px solid ' + s.band[3] + '55';
+      $('scoreSay').textContent = s.band[4];
+    } else {
+      var html = '';
+      scores.forEach(function (s) {
+        var pct = Math.max(4, Math.round(s.total / s.inst.max * 100));
+        var label = s.inst.mode === 'thresholdCount'
+          ? s.total + ' of 6 items flagged'
+          : s.total + ' / ' + s.inst.max;
+        html += '<div class="domain">' +
+          '<div class="domain-top">' +
+            '<div class="domain-name">' + s.inst.icon + ' ' + s.inst.domain +
+              '<small>' + s.inst.name + ' · ' + s.inst.cite + '</small></div>' +
+            '<div class="domain-val" style="color:' + s.band[3] + '">' + s.band[2] +
+              '<small style="display:block;font-weight:400;font-size:12px;color:var(--dim);text-align:right">' + label + '</small></div>' +
+          '</div>' +
+          '<div class="meter"><i data-w="' + pct + '" style="background:' + s.band[3] + '"></i></div>' +
+          '<p class="domain-say">' + s.band[4] + '</p>' +
+        '</div>';
+      });
+      $('domains').innerHTML = html;
+
+      var raised = scores.filter(function (s) { return s.band[3] !== '#2a9e6a'; });
+      $('profileSay').textContent = raised.length === 0
+        ? 'Nothing in this check-in reached a threshold that typically warrants follow-up. That is genuinely worth knowing — and if your lived experience disagrees with these numbers, trust yourself over the questionnaire.'
+        : raised.length === 1
+          ? 'One area came back above a screening threshold: ' + raised[0].inst.domain.toLowerCase() + '. That is a signal worth taking to a professional, not a diagnosis.'
+          : raised.length + ' areas came back above a screening threshold: ' +
+            raised.map(function (s) { return s.inst.domain.toLowerCase(); }).join(', ') +
+            '. Areas often interact — treating one frequently improves the others — which is exactly the kind of thing a clinician can untangle with you.';
+
+      // animate the meters after paint
+      requestAnimationFrame(function () {
+        setTimeout(function () {
+          Array.prototype.forEach.call($('domains').querySelectorAll('.meter i'), function (b) {
+            b.style.width = b.getAttribute('data-w') + '%';
+          });
+        }, 120);
+      });
+    }
 
     show('result');
   }
@@ -158,12 +331,24 @@
     b.addEventListener('click', function () { start(b.getAttribute('data-test')); });
   });
 
-  el('qback').addEventListener('click', function () {
-    if (idx > 0) { idx--; render(); }
+  $('qback').addEventListener('click', function () {
+    if (pos > 0) { pos--; render(); }
   });
 
-  el('again').addEventListener('click', function () {
-    answers = []; idx = 0; current = null;
+  $('again').addEventListener('click', function () {
+    mode = null; answers = {}; flat = []; pos = 0;
     show('pick');
+  });
+
+  // number keys pick an option while a question is showing
+  document.addEventListener('keydown', function (e) {
+    if (!quiz.classList.contains('live')) return;
+    var n = parseInt(e.key, 10);
+    if (n >= 1 && n <= 5) {
+      var opts = $('qopts').querySelectorAll('.opt');
+      if (opts[n - 1]) opts[n - 1].click();
+    } else if (e.key === 'Backspace' && pos > 0) {
+      e.preventDefault(); pos--; render();
+    }
   });
 })();

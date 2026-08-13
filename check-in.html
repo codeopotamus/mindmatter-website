@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>Free mental health check-in — PHQ-9 &amp; GAD-7 | Mind Matter</title>
-<meta name="description" content="Take the PHQ-9 depression screener or the GAD-7 anxiety screener free, right in your browser. No account, no email, nothing stored. Validated instruments used in clinical practice worldwide." />
+<title>Free mental health check-in — PHQ-9, GAD-7 &amp; full evaluation | Mind Matter</title>
+<meta name="description" content="Take the PHQ-9 depression screener, the GAD-7 anxiety screener, or a full four-part check-in covering mood, anxiety, focus and alcohol — free in your browser. No account, no email, nothing stored." />
 <meta name="theme-color" content="#0b1220" />
 <link rel="canonical" href="https://mindmattermentalhealth.com/check-in.html" />
 <link rel="icon" href="logo.png" />
 <meta property="og:site_name" content="Mind Matter" />
-<meta property="og:title" content="Free mental health check-in — PHQ-9 &amp; GAD-7" />
-<meta property="og:description" content="Two validated screeners, free in your browser. No account, no email, nothing stored." />
+<meta property="og:title" content="Free mental health check-in — PHQ-9, GAD-7 &amp; full evaluation" />
+<meta property="og:description" content="Validated screeners, free in your browser. No account, no email, nothing stored." />
 <meta property="og:image" content="https://mindmattermentalhealth.com/logo.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -41,10 +41,10 @@
   <section class="phero" id="intro">
     <div class="shell phero-in">
       <p class="eyebrow">Free · No account · Nothing stored</p>
-      <h1>A real check-in,<br /><span class="grad">in about three minutes.</span></h1>
+      <h1>A real check-in,<br /><span class="grad">not a personality quiz.</span></h1>
       <p>
-        These are the actual screening questionnaires used in clinics worldwide — not a
-        personality quiz. Answer honestly and you'll get a score, what that range typically
+        These are the actual screening instruments used in clinics worldwide, scored the way
+        the research defines. Answer honestly and you get a score, what that range typically
         indicates, and a straight answer about what to do next.
       </p>
     </div>
@@ -53,55 +53,76 @@
   <section class="shell" style="padding-bottom:clamp(50px,7vw,80px)" id="pick">
     <div class="picker">
       <button class="pick rv" data-test="phq9">
-        <div class="k">Depression screener</div>
+        <div class="k">Depression</div>
         <h3>PHQ-9</h3>
-        <p>The most widely used and studied depression screen in clinical practice worldwide. Nine questions about the last two weeks.</p>
-        <div class="meta">9 questions · 3–5 min · Kroenke, Spitzer &amp; Williams, 2001</div>
+        <p>The most widely used and studied depression screen in clinical practice worldwide.</p>
+        <div class="meta">9 questions · 3–5 min · public domain</div>
       </button>
       <button class="pick rv" data-test="gad7">
-        <div class="k">Anxiety screener</div>
+        <div class="k">Anxiety</div>
         <h3>GAD-7</h3>
-        <p>A validated seven-item tool for detecting and measuring generalised anxiety and its severity. Seven questions about the last two weeks.</p>
-        <div class="meta">7 questions · 2–3 min · Spitzer, Kroenke, Williams &amp; Löwe, 2006</div>
+        <p>A validated seven-item measure of generalised anxiety and how severe it currently is.</p>
+        <div class="meta">7 questions · 2–3 min · public domain</div>
+      </button>
+      <button class="pick rv" data-test="full" style="border-color:rgba(91,157,255,.4)">
+        <div class="k" style="color:var(--gold)">Most thorough</div>
+        <h3>Full check-in</h3>
+        <p>All four screeners in one pass — mood, anxiety, focus and attention, and alcohol — returned as a profile across domains rather than a single number.</p>
+        <div class="meta">32 questions · 8–10 min · PHQ-9 · GAD-7 · ASRS · AUDIT</div>
       </button>
     </div>
 
     <div class="disclaim rv" style="margin-top:30px">
-      <b>Before you start.</b> This is a screening tool, not a diagnosis — only a licensed
+      <b>Before you start.</b> These are screening tools, not diagnoses — only a licensed
       clinician can diagnose a mental health condition, and screeners can be wrong in both
-      directions. Your answers never leave your device: there's no account, no email capture,
-      and nothing is sent to us or stored anywhere. Close the tab and it's gone.
+      directions. Your answers never leave your device: there is no account, no email capture,
+      no analytics, and nothing is sent to us or stored anywhere. Close the tab and it is gone.
     </div>
   </section>
 
   <!-- ══ QUIZ ══ -->
   <section class="shell-narrow quiz" id="quiz" style="padding-bottom:60px">
     <div class="qbar"><i id="qprog"></i></div>
+    <div class="section-flag" id="qflag" style="display:none"></div>
     <div class="qcount" id="qcount"></div>
-    <div class="qlead" id="qlead">Over the last two weeks, how often have you been bothered by…</div>
+    <div class="qlead" id="qlead"></div>
     <h2 class="qtext" id="qtext"></h2>
     <div class="opts" id="qopts"></div>
     <div class="qnav">
       <button class="qback" id="qback" type="button">← Back</button>
     </div>
+    <p class="fine" style="margin-top:22px;text-align:left;margin-inline:0">
+      Tip: press <b>1</b>–<b>5</b> to answer, <b>Backspace</b> to go back.
+    </p>
   </section>
 
   <!-- ══ RESULT ══ -->
   <section class="shell-narrow result" id="result" style="padding-bottom:60px">
     <div id="crisisSlot"></div>
 
-    <div class="score-card">
+    <!-- single-instrument result -->
+    <div class="score-card" id="scoreCard">
       <div class="score-n" id="scoreN">0</div>
       <div class="score-of" id="scoreOf"></div>
       <div class="score-band" id="scoreBand"></div>
       <p class="score-say" id="scoreSay"></p>
     </div>
 
+    <!-- multi-domain profile -->
+    <div id="profile" style="display:none">
+      <div class="score-card" style="text-align:left">
+        <p class="eyebrow" style="margin-bottom:10px">Your profile</p>
+        <h2 style="font-size:clamp(1.4rem,1.15rem + 1.1vw,2rem);margin-bottom:14px">Across four domains</h2>
+        <p class="score-say" style="margin:0;text-align:left;max-width:none" id="profileSay"></p>
+      </div>
+      <div class="domains" id="domains"></div>
+    </div>
+
     <div class="disclaim">
-      <b>What this score is and isn't.</b> It's a screening indicator — a signal that something
-      may be worth a proper look by a professional. It is not a diagnosis, it doesn't account
-      for your history or circumstances, and a low score doesn't mean nothing is wrong. If any
-      of this doesn't match your lived experience, trust yourself and talk to someone qualified.
+      <b>What this is and isn't.</b> A screening indicator — a signal that something may be
+      worth a proper look by a professional. It is not a diagnosis, it does not account for
+      your history or circumstances, and a low score does not mean nothing is wrong. If any of
+      this does not match your lived experience, trust yourself and talk to someone qualified.
     </div>
 
     <div class="cta-box" style="margin-top:30px">
@@ -119,13 +140,35 @@
     </div>
   </section>
 
+  <!-- ══ WHAT'S IN THE FULL CHECK-IN ══ -->
+  <section class="band band-line">
+    <div class="shell">
+      <div class="head rv">
+        <p class="eyebrow">About these instruments</p>
+        <h2>Why only these four?</h2>
+        <p class="lede" style="margin-top:14px">
+          The app ships eighteen validated screeners. Only four appear on this public page —
+          the ones whose licences unambiguously permit free commercial use. The rest are free
+          for clinical and research use but have not been cleared for a commercial website, so
+          they stay in the app rather than being reproduced here.
+        </p>
+      </div>
+      <div class="grid">
+        <div class="card rv"><div class="ico">🧠</div><h3>PHQ-9 · Mood</h3><p>Nine items on depressive symptoms over two weeks. Public domain. Kroenke, Spitzer &amp; Williams, <em>J Gen Intern Med</em>, 2001.</p></div>
+        <div class="card rv"><div class="ico">💭</div><h3>GAD-7 · Anxiety</h3><p>Seven items on generalised anxiety over two weeks. Public domain. Spitzer, Kroenke, Williams &amp; Löwe, <em>Arch Intern Med</em>, 2006.</p></div>
+        <div class="card rv"><div class="ico">⚡</div><h3>ASRS · Focus</h3><p>The WHO's six-question adult ADHD screener, scored with its real per-item thresholds rather than a naive sum. Kessler et al., 2005.</p></div>
+        <div class="card rv"><div class="ico">🍷</div><h3>AUDIT · Alcohol</h3><p>The WHO's ten-item screen for hazardous and harmful drinking. Saunders et al., <em>Addiction</em>, 1993.</p></div>
+      </div>
+    </div>
+  </section>
+
   <!-- ══ ALWAYS-ON CRISIS INFO ══ -->
   <section class="shell" style="padding-bottom:clamp(30px,5vw,50px)">
     <div class="safety">
       <h2>If any of this brought something up</h2>
       <p>
-        Thinking honestly about how you've been can surface more than you expected. If you're
-        struggling right now, you don't have to wait until you've finished a questionnaire.
+        Thinking honestly about how you have been can surface more than you expected. If you
+        are struggling right now, you do not have to wait until you have finished a questionnaire.
       </p>
       <ul class="lines">
         <li><b>988</b> — Suicide &amp; Crisis Lifeline (call or text, US)</li>

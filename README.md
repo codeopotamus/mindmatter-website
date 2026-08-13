@@ -66,3 +66,28 @@ project (and remove it from the app project, which currently holds it).
   are not shared. The privacy policy here has one extra disclosure the in-app
   version does not: the Google/Apple sign-in paragraph in Section 1, added
   because Google requires apps to disclose how they handle Google user data.
+
+## The full check-in
+
+`check-in.html` offers three modes: PHQ-9 alone, GAD-7 alone, or a combined
+32-question pass across four domains (mood, anxiety, focus, alcohol) returned as
+a profile rather than one number.
+
+**Only four instruments appear here on purpose.** The app ships eighteen, but
+most are licensed "free for clinical and research use — commercial use not yet
+verified". A public marketing site is commercial use, so only the four with
+unambiguous clearance are reproduced:
+
+| Instrument | Licence |
+|---|---|
+| PHQ-9 | Public domain |
+| GAD-7 | Public domain |
+| ASRS-v1.1 Part A | WHO, no permission required |
+| AUDIT | WHO, no permission required |
+
+Do not add MDQ, PCL-5, OCI-R, ULS-8, DAR-5, EPDS or the others to this site
+without first clearing commercial reproduction rights.
+
+ASRS is scored with its real per-item thresholds (items 1–3 flag at
+"Sometimes", items 4–6 only at "Often"), not a naive sum — summing raw
+frequencies over-weights hyperactivity and misses inattentive presentations.
