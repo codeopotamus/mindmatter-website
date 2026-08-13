@@ -1,0 +1,12 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/features", "destination": "/features.html" },
+    { "source": "/bandura", "destination": "/bandura.html" },
+    { "source": "/therapy", "destination": "/therapy.html" },
+    { "source": "/check-in", "destination": "/check-in.html" },
+    { "source": "/privacy", "destination": "/privacy.html" },
+    { "source": "/terms", "destination": "/terms.html" },
+    { "source": "/safety", "destination": "/safety.html" }
+  ]
+}

@@ -12,14 +12,33 @@ without executing JavaScript, and the app's React site served them an empty page
 
 | File | What it is |
 |---|---|
-| `index.html` | The marketing page (hero, features, screenshots, pricing, safety) |
+| `index.html` | Home (hero, features, screenshots, free check-in, pricing, safety) |
+| `features.html` | Full feature catalogue — 12 quick tools, 18 screeners, insights |
+| `bandura.html` | The AI companion, including its honest limits |
+| `therapy.html` | Using Mind Matter alongside therapy; a section for clinicians |
+| `check-in.html` | Free PHQ-9 / GAD-7 self-screeners (see safety note below) |
 | `privacy.html` | Privacy Policy |
 | `terms.html` | Terms of Service |
 | `safety.html` | Health & Safety Disclaimer |
-| `style.css` | Shared stylesheet for all four pages |
-| `site.js` | Sticky-nav border + scroll reveal. Page is fully readable without it. |
+| `style.css` | Shared stylesheet for every page |
+| `site.js` | Sticky-nav border + scroll reveal. Pages are fully readable without it. |
+| `checkin.js` | Screener logic. Runs entirely in the browser; nothing stored or sent. |
 | `shots/` | App screenshots, cropped from the App Store marketing assets |
+| `social/` | Ready-to-post Instagram graphics (1080×1350, ×1920 story, ×1080 square) |
 | `logo.png` | App icon |
+
+## The free check-in — read before editing
+
+`check-in.html` + `checkin.js` serve real clinical instruments to the public, so
+two rules are load-bearing:
+
+1. **PHQ-9 item 9 asks about thoughts of self-harm.** Any non-zero answer shows
+   crisis resources *above* the score, regardless of the total. A low total with
+   a positive item 9 is exactly the case a naive sum would bury — do not make the
+   crisis panel conditional on the score.
+2. **Nothing is stored or transmitted.** No account, no email capture, no
+   analytics, no `fetch`. Answers live in a local variable and die with the tab.
+   Keep it that way; it is a promise made on the page itself.
 
 ## Preview locally
 

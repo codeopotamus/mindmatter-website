@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Free mental health check-in — PHQ-9 &amp; GAD-7 | Mind Matter</title>
+<meta name="description" content="Take the PHQ-9 depression screener or the GAD-7 anxiety screener free, right in your browser. No account, no email, nothing stored. Validated instruments used in clinical practice worldwide." />
+<meta name="theme-color" content="#0b1220" />
+<link rel="canonical" href="https://mindmattermentalhealth.com/check-in.html" />
+<link rel="icon" href="logo.png" />
+<meta property="og:site_name" content="Mind Matter" />
+<meta property="og:title" content="Free mental health check-in — PHQ-9 &amp; GAD-7" />
+<meta property="og:description" content="Two validated screeners, free in your browser. No account, no email, nothing stored." />
+<meta property="og:image" content="https://mindmattermentalhealth.com/logo.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=Syne:wght@600;700;800&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="shell nav-in">
+    <a class="brand" href="index.html" aria-label="Mind Matter home">
+      <img src="logo.png" alt="" />
+      <span>Mind Matter</span>
+    </a>
+    <nav class="nav-links">
+      <a href="features.html">Features</a>
+      <a href="bandura.html">Bandura</a>
+      <a href="therapy.html">For therapy</a>
+      <a href="check-in.html" aria-current="page">Free check-in</a>
+    </nav>
+    <a class="btn btn-primary" href="index.html#get">Get the app</a>
+  </div>
+</header>
+
+<main>
+
+  <!-- ══ INTRO ══ -->
+  <section class="phero" id="intro">
+    <div class="shell phero-in">
+      <p class="eyebrow">Free · No account · Nothing stored</p>
+      <h1>A real check-in,<br /><span class="grad">in about three minutes.</span></h1>
+      <p>
+        These are the actual screening questionnaires used in clinics worldwide — not a
+        personality quiz. Answer honestly and you'll get a score, what that range typically
+        indicates, and a straight answer about what to do next.
+      </p>
+    </div>
+  </section>
+
+  <section class="shell" style="padding-bottom:clamp(50px,7vw,80px)" id="pick">
+    <div class="picker">
+      <button class="pick rv" data-test="phq9">
+        <div class="k">Depression screener</div>
+        <h3>PHQ-9</h3>
+        <p>The most widely used and studied depression screen in clinical practice worldwide. Nine questions about the last two weeks.</p>
+        <div class="meta">9 questions · 3–5 min · Kroenke, Spitzer &amp; Williams, 2001</div>
+      </button>
+      <button class="pick rv" data-test="gad7">
+        <div class="k">Anxiety screener</div>
+        <h3>GAD-7</h3>
+        <p>A validated seven-item tool for detecting and measuring generalised anxiety and its severity. Seven questions about the last two weeks.</p>
+        <div class="meta">7 questions · 2–3 min · Spitzer, Kroenke, Williams &amp; Löwe, 2006</div>
+      </button>
+    </div>
+
+    <div class="disclaim rv" style="margin-top:30px">
+      <b>Before you start.</b> This is a screening tool, not a diagnosis — only a licensed
+      clinician can diagnose a mental health condition, and screeners can be wrong in both
+      directions. Your answers never leave your device: there's no account, no email capture,
+      and nothing is sent to us or stored anywhere. Close the tab and it's gone.
+    </div>
+  </section>
+
+  <!-- ══ QUIZ ══ -->
+  <section class="shell-narrow quiz" id="quiz" style="padding-bottom:60px">
+    <div class="qbar"><i id="qprog"></i></div>
+    <div class="qcount" id="qcount"></div>
+    <div class="qlead" id="qlead">Over the last two weeks, how often have you been bothered by…</div>
+    <h2 class="qtext" id="qtext"></h2>
+    <div class="opts" id="qopts"></div>
+    <div class="qnav">
+      <button class="qback" id="qback" type="button">← Back</button>
+    </div>
+  </section>
+
+  <!-- ══ RESULT ══ -->
+  <section class="shell-narrow result" id="result" style="padding-bottom:60px">
+    <div id="crisisSlot"></div>
+
+    <div class="score-card">
+      <div class="score-n" id="scoreN">0</div>
+      <div class="score-of" id="scoreOf"></div>
+      <div class="score-band" id="scoreBand"></div>
+      <p class="score-say" id="scoreSay"></p>
+    </div>
+
+    <div class="disclaim">
+      <b>What this score is and isn't.</b> It's a screening indicator — a signal that something
+      may be worth a proper look by a professional. It is not a diagnosis, it doesn't account
+      for your history or circumstances, and a low score doesn't mean nothing is wrong. If any
+      of this doesn't match your lived experience, trust yourself and talk to someone qualified.
+    </div>
+
+    <div class="cta-box" style="margin-top:30px">
+      <h2 style="font-size:clamp(1.4rem,1.15rem + 1.1vw,2rem)">One score is a dot. Ten is a line.</h2>
+      <p class="lede">
+        A single result tells you about today. Tracking the same screener over weeks tells you
+        whether things are actually moving — which is the part that matters, and the part
+        Mind Matter is built to do.
+      </p>
+      <div class="hero-cta" style="justify-content:center">
+        <a class="btn btn-primary" href="index.html#get">Track this in Mind Matter</a>
+        <button class="btn btn-ghost" id="again" type="button">Take another check-in</button>
+      </div>
+      <p class="fine">Mind Matter includes 18 validated screeners, mood tracking, journaling and self-guided CBT and DBT programs.</p>
+    </div>
+  </section>
+
+  <!-- ══ ALWAYS-ON CRISIS INFO ══ -->
+  <section class="shell" style="padding-bottom:clamp(30px,5vw,50px)">
+    <div class="safety">
+      <h2>If any of this brought something up</h2>
+      <p>
+        Thinking honestly about how you've been can surface more than you expected. If you're
+        struggling right now, you don't have to wait until you've finished a questionnaire.
+      </p>
+      <ul class="lines">
+        <li><b>988</b> — Suicide &amp; Crisis Lifeline (call or text, US)</li>
+        <li><b>Text HOME to 741741</b> — Crisis Text Line</li>
+        <li><b>911</b> — or your local emergency number, if there's immediate danger to life</li>
+        <li>Outside the US — find your local line at <a href="https://findahelpline.com" rel="noopener">findahelpline.com</a></li>
+      </ul>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="shell foot">
+    <div>
+      <div class="foot-brand">
+        <img src="logo.png" alt="" />
+        <span>Mind Matter</span>
+      </div>
+      <small>
+        Mind Matter LLC · Arizona, USA<br />
+        <a href="mailto:mindmatter411@gmail.com">mindmatter411@gmail.com</a>
+      </small>
+    </div>
+    <div class="foot-links">
+      <a href="index.html">Home</a>
+      <a href="features.html">Features</a>
+      <a href="bandura.html">Bandura</a>
+      <a href="therapy.html">For therapy</a>
+      <a href="check-in.html">Free check-in</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="terms.html">Terms</a>
+      <a href="safety.html">Health &amp; Safety</a>
+    </div>
+  </div>
+</footer>
+
+<script src="site.js"></script>
+<script src="checkin.js"></script>
+</body>
+</html>
