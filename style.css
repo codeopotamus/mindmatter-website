@@ -420,8 +420,15 @@ footer{border-top:1px solid var(--line-soft);padding:52px 0 60px;margin-top:clam
   transition:border-color .16s ease,background .16s ease,transform .16s ease;
 }
 .opt:hover{border-color:rgba(91,157,255,.5);background:rgba(24,35,58,.8);transform:translateX(3px)}
-.opt .mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:0 0 auto}
+.opt .mark{width:20px;height:20px;border-radius:50%;border:2px solid var(--line);flex:0 0 auto;transition:border-color .16s ease,background .16s ease}
 .opt:hover .mark{border-color:var(--blue)}
+
+/* After advancing to the next question the cursor has not moved, so whichever
+   option renders under it inherits :hover and reads as already-selected.
+   Suppress hover until the pointer genuinely moves again. */
+.opts.no-hover .opt:hover{border-color:var(--line-soft);background:rgba(20,31,54,.55);transform:none}
+.opts.no-hover .opt:hover .mark{border-color:var(--line)}
+.opt .mark.sel{border-color:var(--blue);background:var(--blue);box-shadow:0 0 0 3px rgba(91,157,255,.2)}
 .qnav{display:flex;gap:12px;margin-top:24px}
 .qback{
   background:none;border:1px solid var(--line-soft);color:var(--lo);cursor:pointer;font-family:inherit;
@@ -579,6 +586,76 @@ footer{border-top:1px solid var(--line-soft);padding:52px 0 60px;margin-top:clam
   font-weight:700;color:var(--hi);margin:24px 0 10px}
 .demo-copy p{font-size:15.5px;color:var(--lo);line-height:1.65;min-height:3.3em}
 .demo-hint{margin-top:18px;font-size:13px;color:var(--dim)}
+
+/* ══════════════════════════════════════════════════════════════════
+   MOOD LAB — tap a week of moods and watch the line appear
+   ══════════════════════════════════════════════════════════════════ */
+.lab{
+  padding:clamp(22px,3.4vw,40px);border-radius:var(--r-xl);
+  background:linear-gradient(160deg,rgba(24,35,58,.9),rgba(11,18,32,.8));
+  border:1px solid var(--line-soft);
+}
+.lab svg{width:100%;height:auto;display:block;overflow:visible;touch-action:manipulation}
+.lab-node{cursor:pointer;transition:r .18s ease,fill .18s ease,opacity .18s ease}
+.lab-node:hover{opacity:1!important}
+.lab-hit{cursor:pointer;fill:transparent}
+.lab-lbl{font-size:11px;fill:#5a7096;font-family:'DM Sans',sans-serif}
+.lab-ylbl{font-size:10px;fill:#3f5madd;font-family:'DM Sans',sans-serif}
+.lab-line{fill:none;stroke:url(#labg);stroke-width:3;stroke-linecap:round;stroke-linejoin:round;
+  transition:d .35s ease}
+.lab-fill{fill:url(#labf);transition:d .35s ease}
+
+.lab-out{
+  margin-top:20px;padding:20px 22px;border-radius:var(--r-md);min-height:96px;
+  background:rgba(91,157,255,.07);border:1px solid rgba(91,157,255,.2);
+  transition:background .3s ease,border-color .3s ease;
+}
+.lab-out.empty{background:rgba(255,255,255,.03);border-color:var(--line-soft)}
+.lab-out .k{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:9px}
+.lab-out.empty .k{color:var(--dim)}
+.lab-out .t{font-family:'Syne',sans-serif;font-size:1.12rem;font-weight:700;color:var(--hi);
+  line-height:1.35;margin-bottom:7px}
+.lab-out p{font-size:14.5px;color:var(--lo);line-height:1.6}
+.lab-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:18px}
+.lab-reset{
+  background:none;border:1px solid var(--line-soft);color:var(--lo);cursor:pointer;
+  font-family:inherit;padding:10px 18px;border-radius:100px;font-size:13.5px;
+  transition:color .18s ease,border-color .18s ease;
+}
+.lab-reset:hover{color:var(--hi);border-color:var(--line)}
+.lab-count{font-size:13.5px;color:var(--dim)}
+
+/* ══ feature explorer ══ */
+.expl{display:grid;grid-template-columns:300px 1fr;gap:clamp(20px,3vw,38px);align-items:start}
+@media(max-width:820px){.expl{grid-template-columns:1fr}}
+.expl-list{display:grid;gap:5px;max-height:none}
+.expl-list button{
+  display:flex;align-items:center;gap:13px;width:100%;text-align:left;cursor:pointer;
+  font-family:inherit;font-size:14.5px;font-weight:500;color:var(--lo);
+  padding:13px 15px;border-radius:13px;background:none;border:1px solid transparent;
+  transition:background .18s ease,color .18s ease,border-color .18s ease;
+}
+.expl-list button:hover{background:rgba(255,255,255,.04);color:var(--hi)}
+.expl-list button[aria-selected="true"]{
+  background:rgba(91,157,255,.11);border-color:rgba(91,157,255,.3);color:var(--hi)}
+.expl-list .e-ico{width:30px;height:30px;border-radius:9px;display:grid;place-items:center;
+  font-size:15px;flex:0 0 auto}
+.expl-panel{
+  padding:clamp(24px,3.4vw,40px);border-radius:var(--r-xl);min-height:270px;
+  background:linear-gradient(160deg,rgba(24,35,58,.88),rgba(11,18,32,.72));
+  border:1px solid var(--line-soft);
+}
+.expl-panel .k{font-size:11.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--blue);margin-bottom:12px}
+.expl-panel h3{font-family:'Syne',sans-serif;font-size:clamp(1.3rem,1.1rem + .8vw,1.8rem);
+  font-weight:700;color:var(--hi);margin-bottom:14px}
+.expl-panel p{font-size:15.5px;color:var(--lo);line-height:1.68;margin-bottom:16px}
+.expl-panel ul{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.expl-panel li{display:flex;gap:11px;font-size:14.5px;color:var(--mid);line-height:1.55}
+.expl-panel li::before{content:'—';color:var(--blue);flex:0 0 auto}
+.expl-fade{animation:eIn .42s cubic-bezier(.22,1,.36,1)}
+@keyframes eIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
 
 /* ══ multi-domain results ══ */
 .domains{display:grid;gap:14px;margin-top:24px}

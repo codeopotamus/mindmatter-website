@@ -70,8 +70,8 @@ project (and remove it from the app project, which currently holds it).
 ## The full check-in
 
 `check-in.html` offers three modes: PHQ-9 alone, GAD-7 alone, or a combined
-32-question pass across four domains (mood, anxiety, focus, alcohol) returned as
-a profile rather than one number.
+22-question pass across three domains (mood, anxiety, focus and attention)
+returned as a profile rather than one number.
 
 **Only four instruments appear here on purpose.** The app ships eighteen, but
 most are licensed "free for clinical and research use — commercial use not yet
@@ -83,7 +83,6 @@ unambiguous clearance are reproduced:
 | PHQ-9 | Public domain |
 | GAD-7 | Public domain |
 | ASRS-v1.1 Part A | WHO, no permission required |
-| AUDIT | WHO, no permission required |
 
 Do not add MDQ, PCL-5, OCI-R, ULS-8, DAR-5, EPDS or the others to this site
 without first clearing commercial reproduction rights.
@@ -91,3 +90,17 @@ without first clearing commercial reproduction rights.
 ASRS is scored with its real per-item thresholds (items 1–3 flag at
 "Sometimes", items 4–6 only at "Often"), not a naive sum — summing raw
 frequencies over-weights hyperactivity and misses inattentive presentations.
+
+## Two failure modes worth not reintroducing
+
+**Counters must never be left showing 0.** `site.js` blanks `.stat .n` to `0`
+before animating it up. A stat reading `0` next to "Validated screening
+questionnaires" is wrong content, not a missing animation, so there are two
+guarantees: a per-counter `setTimeout` that settles the final value even if
+`requestAnimationFrame` is paused (background tabs), and a 4s global sweep that
+force-fills anything the IntersectionObserver never reached.
+
+**Answer options must not look pre-selected.** After advancing a question the
+pointer has not moved, so whichever option renders under it inherits `:hover`
+and reads as already chosen. `checkin.js` adds `.no-hover` to `#qopts` on every
+render and removes it on the next real `pointermove`.

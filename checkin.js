@@ -1,11 +1,11 @@
-/* Free self-screeners — PHQ-9, GAD-7, ASRS-v1.1 Part A, AUDIT, and a combined
- * "full check-in" that runs all four.
+/* Free self-screeners — PHQ-9, GAD-7, ASRS-v1.1 Part A, and a combined
+ * "full check-in" that runs all three.
  *
  * ── Licensing ───────────────────────────────────────────────────────────────
  * Only instruments that are unambiguously free for commercial use appear here:
- *   PHQ-9   public domain            GAD-7   public domain
- *   ASRS    WHO, no permission req.  AUDIT   WHO, no permission req.
- * The app ships others (MDQ, PCL-5, OCI-R, ULS-8 …) whose licences are flagged
+ *   PHQ-9   public domain   GAD-7   public domain
+ *   ASRS    WHO, no permission required
+ * The app ships fifteen more (MDQ, PCL-5, OCI-R, ULS-8 …) whose licences read
  * "commercial use not yet verified" — those deliberately stay out of a public
  * marketing site.
  *
@@ -94,52 +94,13 @@
         [0, 3, 'Below screening threshold', '#2a9e6a', 'Fewer than four answers reached that question\'s threshold, so this screen is negative. A negative screen is not proof of absence — the ASRS is known to miss quieter, inattentive presentations. If focus problems are genuinely costing you, that is worth a conversation regardless of this result.'],
         [4, 6, 'Positive screen', '#E24B4A', 'Four or more answers reached their threshold — a positive ASRS screen, the level at which the WHO recommends a full evaluation. This is not a diagnosis: a real ADHD assessment examines your history, functioning, and other explanations. A psychiatrist or psychologist can do that properly.']
       ]
-    },
-
-    audit: {
-      name: 'AUDIT', domain: 'Alcohol', icon: '🍷', max: 40, riskItem: -1,
-      cite: 'Saunders et al., 1993 (WHO)',
-      lead: 'About your drinking over the past year…',
-      scale: ['Never', 'Monthly or less', 'Two to four times a month', 'Two to three times a week', 'Four or more times a week'],
-      vals: [0, 1, 2, 3, 4], mode: 'sum',
-      // The last two items are lifetime/past-year questions with three options
-      // scored 0/2/4 — not the five-point frequency scale the first eight use.
-      itemScales: {
-        1: { scale: ['1 or 2', '3 or 4', '5 or 6', '7 to 9', '10 or more'], vals: [0, 1, 2, 3, 4] },
-        2: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        3: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        4: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        5: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        6: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        7: { scale: ['Never', 'Less than monthly', 'Monthly', 'Weekly', 'Daily or almost daily'], vals: [0, 1, 2, 3, 4] },
-        8: { scale: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], vals: [0, 2, 4] },
-        9: { scale: ['No', 'Yes, but not in the last year', 'Yes, during the last year'], vals: [0, 2, 4] }
-      },
-      questions: [
-        'How often do you have a drink containing alcohol?',
-        'How many standard drinks do you have on a typical day when you are drinking?',
-        'How often do you have six or more drinks on one occasion?',
-        'How often have you found that you were not able to stop drinking once you had started?',
-        'How often have you failed to do what was normally expected of you because of drinking?',
-        'How often have you needed a drink in the morning to get yourself going after a heavy session?',
-        'How often have you had a feeling of guilt or remorse after drinking?',
-        'How often have you been unable to remember what happened the night before because of drinking?',
-        'Have you or someone else been injured as a result of your drinking?',
-        'Has a relative, friend, doctor or health worker been concerned about your drinking, or suggested you cut down?'
-      ],
-      severity: [
-        [0, 7, 'Low risk', '#2a9e6a', 'Your answers suggest low-risk drinking. Worth staying mindful of how alcohol interacts with sleep and mood, but nothing here flags a problem.'],
-        [8, 15, 'Hazardous', '#EF9F27', 'Your answers suggest hazardous drinking that raises your risk of health problems. Worth raising with a GP or healthcare provider — this is a very common conversation and not a judgemental one.'],
-        [16, 19, 'Harmful', '#E24B4A', 'Your answers suggest harmful drinking. Please speak with a healthcare provider. Counselling and support are available and genuinely effective.'],
-        [20, 40, 'Possible dependence', '#E24B4A', 'Your answers suggest possible alcohol dependence. Please speak with a healthcare provider as soon as you can. Effective treatment and support exist, and stopping abruptly without advice can be unsafe.']
-      ]
     }
   };
 
   var MODES = {
     phq9: { title: 'PHQ-9 · Depression', parts: ['phq9'] },
     gad7: { title: 'GAD-7 · Anxiety', parts: ['gad7'] },
-    full: { title: 'Full check-in', parts: ['phq9', 'gad7', 'asrs', 'audit'] }
+    full: { title: 'Full check-in', parts: ['phq9', 'gad7', 'asrs'] }
   };
 
   var CRISIS_HTML =
@@ -220,18 +181,23 @@
     $('qback').style.visibility = pos === 0 ? 'hidden' : 'visible';
 
     var opts = $('qopts');
+    var chosen = answers[step.inst][step.q];
+    var answered = typeof chosen === 'number';
+
     opts.innerHTML = '';
     sc.scale.forEach(function (label, i) {
       var b = document.createElement('button');
       b.type = 'button';
       b.className = 'opt';
-      var chosen = answers[step.inst][step.q];
-      var isSel = chosen === sc.vals[i];
-      b.innerHTML = '<span class="mark"' + (isSel ? ' style="border-color:#5b9dff;background:#5b9dff"' : '') +
-        '></span><span>' + label + '</span>';
+      var isSel = answered && chosen === sc.vals[i];
+      b.innerHTML = '<span class="mark' + (isSel ? ' sel' : '') + '"></span><span>' + label + '</span>';
       b.addEventListener('click', function () { answer(sc.vals[i]); });
       opts.appendChild(b);
     });
+
+    // The pointer has not moved, so the option now sitting under it would show
+    // its hover state and look pre-selected. Hold hover off until a real move.
+    opts.classList.add('no-hover');
   }
 
   function answer(value) {
@@ -326,6 +292,12 @@
 
     show('result');
   }
+
+  // a genuine pointer move re-enables hover styling
+  document.addEventListener('pointermove', function () {
+    var opts = $('qopts');
+    if (opts && opts.classList.contains('no-hover')) opts.classList.remove('no-hover');
+  }, { passive: true });
 
   Array.prototype.forEach.call(document.querySelectorAll('.pick'), function (b) {
     b.addEventListener('click', function () { start(b.getAttribute('data-test')); });

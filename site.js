@@ -106,38 +106,66 @@
 
   /* ── count-up numbers ─────────────────────────────────────────────── */
   function countUp(el) {
+    if (el.dataset.counting === '1') return;     // never run twice on one element
     var target = parseFloat(el.getAttribute('data-count'));
     if (isNaN(target)) return;
     if (reduce) { el.textContent = String(target); return; }
-    var dur = 1100, t0 = null;
+
+    el.dataset.counting = '1';
+    var dur = 1100, t0 = null, done = false;
+
+    function settle() {
+      if (done) return;
+      done = true;
+      el.textContent = String(target);
+    }
+
     function tick(ts) {
+      if (done) return;
       if (t0 === null) t0 = ts;
       var p = Math.min((ts - t0) / dur, 1);
       // easeOutExpo
       var e = p === 1 ? 1 : 1 - Math.pow(2, -10 * p);
       el.textContent = String(Math.round(target * e));
       if (p < 1) requestAnimationFrame(tick);
+      else settle();
     }
     requestAnimationFrame(tick);
+
+    /* rAF is paused in background tabs, which would strand the number partway
+       (e.g. showing 16 when it should read 18). Timers keep running, so use one
+       as a guarantee that the final value always lands. */
+    setTimeout(settle, dur + 250);
   }
 
-  // any .stat .n holding a bare integer becomes a counter
+  /* Any .stat .n holding a bare integer becomes a counter. Only blank it out if
+     it actually sits inside something that will be revealed — otherwise nothing
+     would ever trigger the count and the number would read 0 forever. */
   Array.prototype.forEach.call(document.querySelectorAll('.stat .n'), function (el) {
     var txt = el.textContent.trim();
-    if (/^\d+$/.test(txt)) {
-      el.setAttribute('data-count', txt);
-      if (!reduce) el.textContent = '0';
-    }
+    if (!/^\d+$/.test(txt)) return;
+    el.setAttribute('data-count', txt);
+    var willAnimate = !reduce &&
+      'IntersectionObserver' in window &&
+      el.closest('.rv, .rv-l, .rv-r, .rv-s');
+    if (willAnimate) el.textContent = '0';
   });
 
   /* ── reveals ──────────────────────────────────────────────────────── */
   var items = document.querySelectorAll('.rv, .rv-l, .rv-r, .rv-s');
 
+  /* Counters can sit anywhere inside a revealed element — the reveal class is
+     often on the grid container rather than each tile — so search descendants
+     as well as the element itself. Missing this leaves the numbers at 0. */
+  function runCounters(el) {
+    if (el.matches('[data-count]')) countUp(el);
+    Array.prototype.forEach.call(el.querySelectorAll('[data-count]'), countUp);
+  }
+
   function revealAll() {
     Array.prototype.forEach.call(items, function (el) {
       el.classList.add('in');
-      var n = el.matches('.stat') ? el.querySelector('.n[data-count]') : null;
-      if (n) countUp(n);
+      runCounters(el);
     });
   }
 
@@ -148,8 +176,7 @@
       entries.forEach(function (e) {
         if (!e.isIntersecting) return;
         e.target.classList.add('in');
-        var n = e.target.matches('.stat') ? e.target.querySelector('.n[data-count]') : null;
-        if (n) countUp(n);
+        runCounters(e.target);
         io.unobserve(e.target);
       });
     }, { rootMargin: '0px 0px -7% 0px', threshold: 0.05 });
@@ -159,6 +186,17 @@
       el.style.transitionDelay = Math.min(i % 6, 4) * 55 + 'ms';
       io.observe(el);
     });
+
+    /* Safety net. A stat blanked to "0" while waiting to animate is not a
+       missing flourish — it reads as "0 validated screening questionnaires".
+       If anything stops the observer firing (background tab, an odd browser,
+       a throttled renderer), force every counter to its real value rather than
+       leave false numbers on the page. */
+    setTimeout(function () {
+      Array.prototype.forEach.call(document.querySelectorAll('[data-count]'), function (el) {
+        if (el.dataset.counting !== '1') el.textContent = el.getAttribute('data-count');
+      });
+    }, 4000);
   }
 
   /* ── parallax ─────────────────────────────────────────────────────── */

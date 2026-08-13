@@ -126,6 +126,88 @@
     </div>
   </section>
 
+  <!-- ══ EXPLORER ══ -->
+  <section class="band band-line" id="explore">
+    <div class="shell">
+      <div class="head rv">
+        <p class="eyebrow">Explore</p>
+        <h2>Pick a part of the app.</h2>
+      </div>
+      <div class="expl rv">
+        <div class="expl-list" id="explList" role="tablist" aria-label="Areas of the app">
+        <button type="button" role="tab" aria-selected="true" data-panel="checkin"><span class="e-ico" style="background:rgba(79,158,255,.13);border:1px solid rgba(79,158,255,.3)">📊</span>Daily check-in</button>
+        <button type="button" role="tab" aria-selected="false" data-panel="journal"><span class="e-ico" style="background:rgba(167,139,250,.13);border:1px solid rgba(167,139,250,.3)">✍️</span>Journal</button>
+        <button type="button" role="tab" aria-selected="false" data-panel="screeners"><span class="e-ico" style="background:rgba(147,194,255,.13);border:1px solid rgba(147,194,255,.3)">🧠</span>Wellbeing screeners</button>
+        <button type="button" role="tab" aria-selected="false" data-panel="programs"><span class="e-ico" style="background:rgba(61,220,146,.13);border:1px solid rgba(61,220,146,.3)">📚</span>Guided programs</button>
+        <button type="button" role="tab" aria-selected="false" data-panel="insights"><span class="e-ico" style="background:rgba(240,201,140,.13);border:1px solid rgba(240,201,140,.32)">📈</span>Trends & insights</button>
+        <button type="button" role="tab" aria-selected="false" data-panel="crisis"><span class="e-ico" style="background:rgba(255,107,107,.13);border:1px solid rgba(255,107,107,.3)">🛟</span>Crisis tools</button>
+        </div>
+        <div class="expl-panel" id="explPanel">
+      <div class="expl-body" id="p-checkin">
+        <div class="k">The two-minute habit</div>
+        <h3>Daily check-in</h3>
+        <p>The whole daily obligation is one tap. Rate the day, optionally note what drove it, and you are done — the app is deliberately designed so the minimum viable action still produces a usable record.</p>
+        <ul>
+            <li>A streak counter and consistency grid that reward turning up, not performing wellness</li>
+            <li>Milestones at 3, 7, 14, 30, 50, 100 and 365 days</li>
+            <li>Backfill a day you missed without breaking the record</li>
+        </ul>
+      </div>
+      <div class="expl-body" id="p-journal" hidden>
+        <div class="k">Somewhere to put it</div>
+        <h3>Journal</h3>
+        <p>Free writing with prompts for the nights the page feels blank. Entries are timestamped, searchable, and tied to the mood you logged that day — so a bad week comes with its own explanation attached.</p>
+        <ul>
+            <li>Prompts when you do not know where to start</li>
+            <li>Everything searchable later, by date or content</li>
+            <li>Cognitive distortions detected in your own writing</li>
+        </ul>
+      </div>
+      <div class="expl-body" id="p-screeners" hidden>
+        <div class="k">Eighteen real instruments</div>
+        <h3>Wellbeing screeners</h3>
+        <p>Published, validated questionnaires used in actual clinical practice — cited to their original papers and scored the way the research defines, not approximated.</p>
+        <ul>
+            <li>PHQ-9, GAD-7, PCL-5, ASRS, AUDIT, OCI-R, EPDS and eleven more</li>
+            <li>Scored per the source paper, including per-item thresholds where that is how the instrument works</li>
+            <li>Tracked over time, so you see a direction rather than one number</li>
+        </ul>
+      </div>
+      <div class="expl-body" id="p-programs" hidden>
+        <div class="k">Therapy work, self-paced</div>
+        <h3>Guided programs</h3>
+        <p>Multi-session tracks built on cognitive behavioural and dialectical behaviour therapy — the two most evidence-backed frameworks in modern mental health care.</p>
+        <ul>
+            <li>Covering depression, anxiety, ADHD and trauma</li>
+            <li>Thought records you complete when the thought actually shows up</li>
+            <li>A treatment plan tracking what you tried and what genuinely helped</li>
+        </ul>
+      </div>
+      <div class="expl-body" id="p-insights" hidden>
+        <div class="k">The part you cannot do in your head</div>
+        <h3>Trends & insights</h3>
+        <p>Once there are a few weeks of data, the app stops describing your mood and starts finding reasons for it — correlations drawn from your own logs rather than generic advice.</p>
+        <ul>
+            <li>Mood over weeks, months and years with rolling averages</li>
+            <li>What actually moves your baseline: sleep, movement, medication, cycle</li>
+            <li>A yearly retrospective of how far the line really moved</li>
+        </ul>
+      </div>
+      <div class="expl-body" id="p-crisis" hidden>
+        <div class="k">Built for your worst night</div>
+        <h3>Crisis tools</h3>
+        <p>Most wellness apps are designed for the version of you that is already coping. The hardest moments need fewer words, bigger buttons, and a plan you wrote before you needed it.</p>
+        <ul>
+            <li>SOS Calm — guided box breathing and grounding, no reading required</li>
+            <li>A crisis plan written while you are steady: warning signs, people, what helps</li>
+            <li>The right crisis line for the country you are in</li>
+        </ul>
+      </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- ══ ASSESSMENTS ══ -->
   <section class="band band-line">
     <div class="shell split">
@@ -286,5 +368,6 @@
 </footer>
 
 <script src="site.js"></script>
+<script src="explorer.js"></script>
 </body>
 </html>
